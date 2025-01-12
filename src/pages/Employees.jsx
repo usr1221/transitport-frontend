@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Table, TableBody, TableCell, TableHead, TableRow, Button } from '@mui/material';
+import { Box } from '@mui/material';
+import {DataGrid} from '@mui/x-data-grid';
 import axios from '../axiosInstance';
 
 function Employees() {
     const [employees, setEmployees] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchEmployees = async () => {
@@ -14,38 +16,49 @@ function Employees() {
                 setEmployees(response.data);
             } catch (error) {
                 console.error('Error fetching employees:', error.response?.data);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchEmployees();
     }, []);
 
+    // Definiowanie kolumn
+    const columns = [
+        { field: 'id', headerName: 'ID', width: 90 },
+        { field: 'name', headerName: 'Name', width: 200 },
+        { field: 'email', headerName: 'Email', width: 250 },
+        { field: 'position', headerName: 'Position', width: 150 },
+        { field: 'phoneNumber', headerName: 'Phone', width: 150 },
+    ];
+
+    // Modyfikowanie danych dla DataGridPro
+    const rows = employees.map((employee) => ({
+        id: employee.id,
+        name: `${employee.firstName} ${employee.lastName}`,
+        email: employee.email,
+        position: employee.position,
+        phoneNumber: employee.phoneNumber,
+    }));
+
     return (
-        <Container>
-            <Typography variant="h4" gutterBottom>
-                Employees List
-            </Typography>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Email</TableCell>
-                        <TableCell>Position</TableCell>
-                        <TableCell>Phone</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {employees.map((employee) => (
-                        <TableRow key={employee.id}>
-                            <TableCell>{`${employee.firstName} ${employee.lastName}`}</TableCell>
-                            <TableCell>{employee.email}</TableCell>
-                            <TableCell>{employee.position}</TableCell>
-                            <TableCell>{employee.phoneNumber}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </Container>
+        <Box sx={{ height: 400, width: '100%' }}>
+            <DataGrid
+                rows={rows}
+                columns={columns}
+                initialState={{
+                    pagination: {
+                        paginationModel: {
+                            pageSize: 5,
+                        },
+                    },
+                }}
+                pageSizeOptions={[5]}
+                checkboxSelection
+                disableRowSelectionOnClick
+            />
+        </Box>
     );
 }
 

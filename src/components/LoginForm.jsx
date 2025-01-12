@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography } from '@mui/material';
+import ButtonAppBar from '../components/ButtonAppBar';
 import api from '../api';
 
 const LoginForm = () => {
@@ -19,30 +20,89 @@ const LoginForm = () => {
 
     return (
         <Box
-            display="flex"
-            flexDirection="column"
-            maxWidth={400}
-            margin="auto"
-            padding={3}
+            sx={{
+                height: '100vh',
+                backgroundImage: 'url("login.jpg")', // Obraz tła
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+            }}
         >
-            <Typography variant="h5" align="center" gutterBottom>Login</Typography>
-            {error && <Typography color="error">{error}</Typography>}
-            <TextField
-                label="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                margin="normal"
-            />
-            <TextField
-                label="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                margin="normal"
-            />
-            <Button variant="contained" color="primary" onClick={handleLogin}>
-                Login
-            </Button>
+            {/* Pasek nawigacyjny */}
+            <ButtonAppBar />
+
+            {/* Czarny box z formularzem */}
+            <Box
+                sx={{
+                    marginTop: '64px', // Odstęp równy wysokości AppBar
+                    marginX: 'auto',
+                    padding: '20px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Czarne przezroczyste tło
+                    borderRadius: '8px',
+                    maxWidth: '400px',
+                    color: 'white',
+                    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.5)',
+                    textAlign: 'center', // Wyśrodkowanie tekstu
+                }}
+            >
+                <Typography variant="h5" align="center" gutterBottom>
+                    Login
+                </Typography>
+                {error && (
+                    <Typography color="error" sx={{ marginBottom: '10px' }}>
+                        {error}
+                    </Typography>
+                )}
+                <TextField
+                    label="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    margin="normal"
+                    fullWidth
+                    InputLabelProps={{ style: { color: 'white' } }} // Kolor etykiet
+                    sx={{
+                        '& .MuiInputBase-input': { color: 'white' }, // Kolor tekstu
+                        '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'white' }, // Obramowanie
+                            '&:hover fieldset': { borderColor: 'gray' }, // Hover
+                            '&.Mui-focused fieldset': { borderColor: 'white' }, // Focus
+                        },
+                    }}
+                />
+                <TextField
+                    label="Password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    margin="normal"
+                    fullWidth
+                    InputLabelProps={{ style: { color: 'white' } }}
+                    sx={{
+                        '& .MuiInputBase-input': { color: 'white' },
+                        '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'white' },
+                            '&:hover fieldset': { borderColor: 'gray' },
+                            '&.Mui-focused fieldset': { borderColor: 'white' },
+                        },
+                    }}
+                />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleLogin}
+                    sx={{
+                        marginTop: '20px',
+                        backgroundColor: 'white', // Przycisk biały
+                        color: 'black', // Czarny tekst
+                        '&:hover': {
+                            backgroundColor: 'gray',
+                            color: 'white',
+                        },
+                    }}
+                >
+                    Login
+                </Button>
+            </Box>
         </Box>
     );
 };
