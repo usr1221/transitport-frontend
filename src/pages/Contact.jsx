@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ButtonAppBar from "../components/ButtonAppBar";
+import ConditionalAppBar from "../components/ConditionalAppBar";
 
 function Contact() {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ function Contact() {
             }}
         >
             {/* Pasek nawigacyjny na górze */}
-            <ButtonAppBar />
+            <ConditionalAppBar />
 
             {/* Wyśrodkowany przezroczysty box */}
             <Box

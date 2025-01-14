@@ -28,7 +28,7 @@ export default function ButtonAppBar() {
                         color="inherit"
                         onClick={() => navigate('/login')}
                         sx={{ marginLeft: 'auto' }}
-                        > Login
+                        > Zaloguj
                     </Button>
                 </Toolbar>
             </AppBar>

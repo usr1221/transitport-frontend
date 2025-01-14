@@ -3,6 +3,7 @@ import {Container, Typography, Button, Box} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ButtonAppBar from "../components/ButtonAppBar";
 import TooltipPlus from "../components/TooltipPlus";
+import ConditionalAppBar from "../components/ConditionalAppBar";
 
 function Home() {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ function Home() {
                 backgroundRepeat: 'no-repeat',
             }}
         >
-            <ButtonAppBar/>
+            <ConditionalAppBar/>
             <TooltipPlus
                 text="Posiadamy nabrzeża przystosowane do obsługi zarówno małych, jak i tych największych statków."
                 positionTop="75%"

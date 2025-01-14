@@ -3,6 +3,19 @@ import { TextField, Button, Box, Typography } from '@mui/material';
 import ButtonAppBar from '../components/ButtonAppBar';
 import api from '../api';
 
+export const fetchUserRole = async () => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await api.get('/auth/role', {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data; // Rola użytkownika
+    } catch (err) {
+        console.error('Failed to fetch role', err);
+        return null;
+    }
+};
+
 const LoginForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -12,7 +25,19 @@ const LoginForm = () => {
         try {
             const response = await api.post('/auth/login', { email, password });
             localStorage.setItem('jwtToken', response.data.token);
-            window.location.href = '/employees';
+
+            const role = await fetchUserRole(); // Pobierz rolę z backendu
+            if (role === 'ROLE_ADMIN') {
+                window.location.href = '/admin';
+            } else if (role === 'ROLE_MAINTAINER') {
+                window.location.href = '/maintainer';
+            } else if (role === 'ROLE_WAREHOUSE') {
+                window.location.href = '/warehouse';
+            } else if (role === 'ROLE_HANDLER') {
+                window.location.href = '/handler';
+            } else {
+                window.location.href = '/employees';
+            }
         } catch (err) {
             setError('Invalid email or password');
         }
