@@ -10,6 +10,8 @@ import Maintainer from "./pages/Maintainer";
 import PrivateRoute from "./components/PrivateRoute";
 import AccessDenied from "./pages/AccessDenied";
 import Handler from "./pages/Handler";
+import Ships from "./pages/Ships";
+import Terminals from "./pages/Terminals";
 
 function App() {
   return (
@@ -18,28 +20,30 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/employees" element={<Employees />} />
+          <Route path="/ships" element={<Ships />} />
+          <Route path="/terminals" element={<Terminals />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={
-                   <PrivateRoute allowedRole="ROLE_ADMIN">
+                   <PrivateRoute allowedRoles={["ROLE_ADMIN"]}>
                        <Admin />
                    </PrivateRoute>
                }
           />
           <Route path="/warehouse"
                  element={
-                     <PrivateRoute allowedRole="ROLE_WAREHOUSE">
+                     <PrivateRoute allowedRoles={["ROLE_WAREHOUSE", "ROLE_ADMIN"]}>
                         <Warehouse />
                      </PrivateRoute>} />
           <Route path="/maintainer"
                 element={
-                    <PrivateRoute allowedRole="ROLE_MAINTAINER">
+                    <PrivateRoute allowedRoles={["ROLE_MAINTAINER", "ROLE_ADMIN"]}>
                         <Maintainer />
                     </PrivateRoute>
                 }
           />
           <Route path="/handler"
                  element={
-                     <PrivateRoute allowedRole="ROLE_HANDLER">
+                     <PrivateRoute allowedRoles={["ROLE_HANDLER", "ROLE_ADMIN"]}>
                          <Handler />
                      </PrivateRoute>
                  }

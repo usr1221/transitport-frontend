@@ -35,7 +35,7 @@ export default function AccountAppBar() {
                     navigate('/handler');
                     break;
                 default:
-                    navigate('/employees'); // Domyślna strona
+                    navigate('/'); // Domyślna strona
                     break;
             }
         } catch (error) {

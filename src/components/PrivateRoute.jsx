@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import api from '../api';
 
-const PrivateRoute = ({ children, allowedRole }) => {
+const PrivateRoute = ({ children, allowedRoles }) => {
     const [userRole, setUserRole] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -34,7 +34,7 @@ const PrivateRoute = ({ children, allowedRole }) => {
         return <div>Loading...</div>; // Wyświetlaj komunikat w trakcie ładowania
     }
 
-    if (userRole !== allowedRole) {
+    if (!allowedRoles.includes(userRole)) {
         return <Navigate to="/access-denied" />;
     }
 
