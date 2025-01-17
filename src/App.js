@@ -12,6 +12,7 @@ import AccessDenied from "./pages/AccessDenied";
 import Handler from "./pages/Handler";
 import Ships from "./pages/Ships";
 import Terminals from "./pages/Terminals";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
                  }
           />
           <Route path="/access-denied"  element={<AccessDenied />} />
+            <Route path="*"  element={<NotFound />} />
         </Routes>
       </Router>
   );

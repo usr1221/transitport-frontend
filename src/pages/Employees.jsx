@@ -356,7 +356,7 @@ function Employees() {
                         <MenuItem value="Administrator">Administrator</MenuItem>
                         <MenuItem value="Konserwator">Konserwator</MenuItem>
                         <MenuItem value="Magazynier">Magazynier</MenuItem>
-                        <MenuItem value="Przeladunkowy">Przeładunkowy</MenuItem>
+                        <MenuItem value="Przeładunkowy">Przeładunkowy</MenuItem>
                     </TextField>
                     <TextField
                         label="Port Number"

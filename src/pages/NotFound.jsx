@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const AccessDenied = () => {
+const NotFound = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
         // Automatically redirect after the component is rendered
         const timeout = setTimeout(() => {
             navigate('/');
-        }, 1000); // Redirect after 3 seconds (adjust as needed)
+        }, 1000); // Redirect after 5 seconds (adjust as needed)
 
         // Cleanup the timeout if the component unmounts before the timeout executes
         return () => clearTimeout(timeout);
@@ -16,11 +16,11 @@ const AccessDenied = () => {
 
     return (
         <div>
-            <h1>Brak uprawnień</h1>
-            <p>Nie masz wystarczających uprawnień, aby zobaczyć tę stronę.</p>
-            <p>Przekierowanie na stronę główną...</p>
+            <h1>404 - Strona nie znaleziona</h1>
+            <p>Przepraszamy, ale strona, której szukasz, nie istnieje.</p>
+            <p>Za chwilę zostaniesz przekierowany na stronę główną...</p>
         </div>
     );
 };
 
-export default AccessDenied;
+export default NotFound;
