@@ -30,7 +30,7 @@ function App() {
                    </PrivateRoute>
                }
           />
-          <Route path="/warehouse"
+          <Route path="/warehouses"
                  element={
                      <PrivateRoute allowedRoles={["ROLE_WAREHOUSE", "ROLE_ADMIN"]}>
                         <Warehouse />
