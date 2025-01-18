@@ -7,12 +7,16 @@ import {
     DialogContent,
     DialogTitle,
     TextField,
+    Typography,
+    MenuItem,
 } from "@mui/material";
+import "../global.css";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "../axiosInstance";
 
 function Terminals() {
     const [terminals, setTerminals] = useState([]);
+    const [ports, setPorts] = useState([]); // State for ports
     const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [newTerminal, setNewTerminal] = useState({
@@ -22,19 +26,27 @@ function Terminals() {
     });
     const [editTerminal, setEditTerminal] = useState(null);
 
+    // Fetch terminals and ports on load
     useEffect(() => {
-        const fetchTerminals = async () => {
+        const fetchData = async () => {
             try {
-                const response = await axios.get("/api/terminals", {
-                    headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
-                });
-                setTerminals(response.data);
+                const [terminalsResponse, portsResponse] = await Promise.all([
+                    axios.get("/api/terminals", {
+                        headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
+                    }),
+                    axios.get("/api/ports", {
+                        headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
+                    }),
+                ]);
+
+                setTerminals(terminalsResponse.data);
+                setPorts(portsResponse.data);
             } catch (error) {
-                console.error("Error fetching terminals:", error.response?.data);
+                console.error("Error fetching data:", error.response?.data);
             }
         };
 
-        fetchTerminals();
+        fetchData();
     }, []);
 
     const handleRegisterOpen = () => {
@@ -67,8 +79,8 @@ function Terminals() {
     };
 
     const handleEditOpen = (terminal) => {
-        setEditTerminal(terminal); // Ustawienie edytowanego terminala
-        setEditDialogOpen(true);   // Otworzenie dialogu
+        setEditTerminal(terminal);
+        setEditDialogOpen(true);
     };
 
     const handleEditClose = () => {
@@ -86,14 +98,11 @@ function Terminals() {
                 headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
             });
             alert("Terminal updated successfully!");
-
-            // Aktualizacja listy terminali
             setTerminals((prevTerminals) =>
                 prevTerminals.map((terminal) =>
                     terminal.id === editTerminal.id ? editTerminal : terminal
                 )
             );
-
             handleEditClose();
         } catch (error) {
             console.error("Error updating terminal:", error.response?.data);
@@ -116,7 +125,7 @@ function Terminals() {
         { field: "id", headerName: "ID", width: 90 },
         { field: "name", headerName: "Name", width: 200 },
         { field: "wharvesCount", headerName: "Wharves Count", width: 150 },
-        { field: "portId", headerName: "Port ID", width: 150 },
+        { field: "portName", headerName: "Port", width: 200 }, // Display port name
         {
             field: "actions",
             headerName: "Actions",
@@ -130,7 +139,7 @@ function Terminals() {
                         onClick={() => handleEditOpen(params.row)}
                         sx={{ marginRight: 1 }}
                     >
-                        Modyfikuj
+                        Edytuj
                     </Button>
                     <Button
                         variant="contained"
@@ -149,29 +158,92 @@ function Terminals() {
         id: terminal.id,
         name: terminal.name,
         wharvesCount: terminal.wharvesCount,
-        portId: terminal.port?.id || "Brak danych",
+        portName: terminal.port?.name || "Brak danych", // Show port name instead of ID
     }));
 
     return (
-        <Box sx={{ height: 400, width: "100%" }}>
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleRegisterOpen}
+        <Box
+            sx={{
+                position: "relative",
+                width: "100%",
+                height: "100vh",
+                background: "url(terminals.jpg) center center / cover no-repeat",
+                overflowX: "hidden",
+                padding: "20px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+            }}
+        >
+            <Box
                 sx={{
-                    position: "absolute",
-                    top: "20px",
-                    right: "20px",
-                    zIndex: 1,
+                    width: "90%",
+                    maxWidth: "1000px",
+                    backgroundColor: "rgba(255, 255, 255, 0.95)",
+                    borderRadius: "16px",
+                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
+                    padding: "20px",
+                    overflow: "hidden",
                 }}
             >
-                ZAREJESTRUJ
-            </Button>
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "20px",
+                    }}
+                >
+                    <Typography
+                        variant="h5"
+                        sx={{
+                            fontWeight: "bold",
+                            color: "#333",
+                        }}
+                    >
+                        Zarządzanie terminalami
+                    </Typography>
 
-            <DataGrid rows={rows} columns={columns} pageSizeOptions={[5]} />
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleRegisterOpen}
+                        sx={{
+                            fontWeight: "bold",
+                        }}
+                    >
+                        Dodaj terminal
+                    </Button>
+                </Box>
 
-            {/* Dialog rejestracji */}
-            <Dialog open={registerDialogOpen} onClose={handleRegisterClose}>
+                <Box
+                    sx={{
+                        height: "400px",
+                        overflow: "hidden",
+                    }}
+                >
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        initialState={{
+                            pagination: {
+                                paginationModel: {
+                                    pageSize: 5,
+                                },
+                            },
+                        }}
+                        pageSizeOptions={[5]}
+                        checkboxSelection
+                        disableRowSelectionOnClick
+                        sx={{
+                            fontSize: { xs: "0.8rem", sm: "1rem" },
+                        }}
+                    />
+                </Box>
+            </Box>
+
+            {/* Register Terminal Dialog */}
+            <Dialog open={registerDialogOpen} onClose={handleRegisterClose} fullWidth maxWidth="sm">
                 <DialogTitle>Zarejestruj nowy terminal</DialogTitle>
                 <DialogContent>
                     <TextField
@@ -189,25 +261,32 @@ function Terminals() {
                         fullWidth
                     />
                     <TextField
-                        label="Port ID"
+                        label="Port"
                         value={newTerminal.portId}
                         onChange={(e) => handleRegisterChange("portId", e.target.value)}
                         margin="normal"
                         fullWidth
-                    />
+                        select
+                    >
+                        {ports.map((port) => (
+                            <MenuItem key={port.id} value={port.id}>
+                                {port.name}
+                            </MenuItem>
+                        ))}
+                    </TextField>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleRegisterClose} color="secondary">
                         Anuluj
                     </Button>
                     <Button onClick={handleRegisterSubmit} color="primary">
-                        Zarejestruj
+                        Dodaj terminal
                     </Button>
                 </DialogActions>
             </Dialog>
 
-            {/* Dialog edycji */}
-            <Dialog open={editDialogOpen} onClose={handleEditClose}>
+            {/* Edit Terminal Dialog */}
+            <Dialog open={editDialogOpen} onClose={handleEditClose} fullWidth maxWidth="sm">
                 <DialogTitle>Edytuj terminal</DialogTitle>
                 <DialogContent>
                     <TextField
@@ -225,12 +304,19 @@ function Terminals() {
                         fullWidth
                     />
                     <TextField
-                        label="Port ID"
+                        label="Port"
                         value={editTerminal?.portId || ""}
                         onChange={(e) => handleEditChange("portId", e.target.value)}
                         margin="normal"
                         fullWidth
-                    />
+                        select
+                    >
+                        {ports.map((port) => (
+                            <MenuItem key={port.id} value={port.id}>
+                                {port.name}
+                            </MenuItem>
+                        ))}
+                    </TextField>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleEditClose} color="secondary">

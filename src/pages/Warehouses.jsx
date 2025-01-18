@@ -7,7 +7,8 @@ import {
     DialogContent,
     DialogTitle,
     TextField,
-    MenuItem,
+    Typography,
+    MenuItem
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from '../axiosInstance';
@@ -153,7 +154,7 @@ function Warehouses() {
                         onClick={() => handleEditOpen(params.row)}
                         sx={{ marginRight: 1 }}
                     >
-                        Edit
+                        Edytuj
                     </Button>
                     <Button
                         variant="contained"
@@ -161,7 +162,7 @@ function Warehouses() {
                         size="small"
                         onClick={() => handleDelete(params.row.id)}
                     >
-                        Delete
+                        Usuń
                     </Button>
                 </Box>
             ),
@@ -172,44 +173,96 @@ function Warehouses() {
         id: warehouse.id,
         capacity: warehouse.capacity,
         occupancy: warehouse.occupancy,
-        terminal: warehouse.terminal?.id || 'No Terminal',
+        terminal: warehouse.terminal?.name
     }));
 
     return (
-        <Box sx={{ position: 'relative', height: '100%', width: '100%' }}>
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleRegisterOpen}
+        <Box
+            sx={{
+                position: 'relative',
+                width: '100%',
+                height: '100vh',
+                background: 'url(warehouses.jpg) center center / cover no-repeat',
+                overflowX: 'hidden',
+                padding: '20px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
+        >
+            {/* Panel Container */}
+            <Box
                 sx={{
-                    position: 'absolute',
-                    top: '20px',
-                    right: '20px',
-                    zIndex: 1,
+                    width: '90%',
+                    maxWidth: '1000px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderRadius: '16px',
+                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
+                    padding: '20px',
+                    overflow: 'hidden',
                 }}
             >
-                Register Warehouse
-            </Button>
-
-            <Box sx={{ height: 400, width: '100%', marginTop: '60px' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    initialState={{
-                        pagination: {
-                            paginationModel: {
-                                pageSize: 5,
-                            },
-                        },
+                {/* Toolbar */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '20px',
                     }}
-                    pageSizeOptions={[5]}
-                    checkboxSelection
-                    disableRowSelectionOnClick
-                />
+                >
+                    <Typography
+                        variant="h5"
+                        sx={{
+                            fontWeight: 'bold',
+                            color: '#333',
+                        }}
+                    >
+                        Zarządzanie magazynami
+                    </Typography>
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleRegisterOpen}
+                        sx={{
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        Zarejestruj magazyn
+                    </Button>
+                </Box>
+
+                {/* DataGrid */}
+                <Box
+                    sx={{
+                        height: '400px',
+                        overflow: 'hidden',
+                    }}
+                >
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        initialState={{
+                            pagination: {
+                                paginationModel: {
+                                    pageSize: 5,
+                                },
+                            },
+                        }}
+                        pageSizeOptions={[5]}
+                        checkboxSelection
+                        disableRowSelectionOnClick
+                        sx={{
+                            fontSize: { xs: '0.8rem', sm: '1rem' },
+                        }}
+                    />
+                </Box>
             </Box>
 
-            <Dialog open={editDialogOpen} onClose={handleEditClose}>
-                <DialogTitle>Edit Warehouse</DialogTitle>
+            {/* Edit Warehouse Dialog */}
+            <Dialog open={editDialogOpen} onClose={handleEditClose} fullWidth maxWidth="sm">
+                <DialogTitle>Edytuj magazyn</DialogTitle>
                 <DialogContent>
                     <TextField
                         label="Capacity"
@@ -227,12 +280,13 @@ function Warehouses() {
                     />
                     <TextField
                         label="Terminal"
-                        value={editWarehouse?.terminal || ''}
-                        onChange={(e) => handleEditChange('terminal', e.target.value)}
+                        value={newWarehouse.terminalId}
+                        onChange={(e) => handleRegisterChange('terminalId', e.target.value)}
                         margin="normal"
                         fullWidth
                         select
                     >
+                        {/* Ensure "No Terminal" sets a null-like value */}
                         <MenuItem value="">No Terminal</MenuItem>
                         {terminals.map((terminal) => (
                             <MenuItem key={terminal.id} value={terminal.id}>
@@ -243,16 +297,17 @@ function Warehouses() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleEditClose} color="secondary">
-                        Cancel
+                        Anuluj
                     </Button>
                     <Button onClick={handleEditSave} color="primary">
-                        Save
+                        Zapisz
                     </Button>
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={registerDialogOpen} onClose={handleRegisterClose}>
-                <DialogTitle>Register New Warehouse</DialogTitle>
+            {/* Register Warehouse Dialog */}
+            <Dialog open={registerDialogOpen} onClose={handleRegisterClose} fullWidth maxWidth="sm">
+                <DialogTitle>Zarejestruj nowy magazyn</DialogTitle>
                 <DialogContent>
                     <TextField
                         label="Capacity"
@@ -286,14 +341,15 @@ function Warehouses() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleRegisterClose} color="secondary">
-                        Cancel
+                        Anuluj
                     </Button>
                     <Button onClick={handleRegisterSubmit} color="primary">
-                        Register
+                        Zarejestruj
                     </Button>
                 </DialogActions>
             </Dialog>
         </Box>
+
     );
 }
 

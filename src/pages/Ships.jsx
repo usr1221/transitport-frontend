@@ -8,7 +8,9 @@ import {
     DialogTitle,
     TextField,
     MenuItem,
+    Typography,
 } from '@mui/material';
+import '../global.css';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from '../axiosInstance';
 
@@ -119,7 +121,7 @@ function Ships() {
     const handleEditSave = async () => {
         const shipToSave = {
             ...editShip,
-            wharf: editShip.wharf?.id || "", // Jeśli wharf jest null lub pusty, ustaw ""
+            wharf: editShip.wharf?.id || '',
         };
 
         try {
@@ -169,7 +171,7 @@ function Ships() {
                         onClick={() => handleEditOpen(params.row)}
                         sx={{ marginRight: 1 }}
                     >
-                        Edit
+                        Edytuj
                     </Button>
                     <Button
                         variant="contained"
@@ -177,7 +179,7 @@ function Ships() {
                         size="small"
                         onClick={() => handleDelete(params.row.id)}
                     >
-                        Delete
+                        Usuń
                     </Button>
                 </Box>
             ),
@@ -196,39 +198,92 @@ function Ships() {
     }));
 
     return (
-        <Box sx={{ position: 'relative', height: '100%', width: '100%' }}>
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleRegisterOpen}
+        <Box
+            sx={{
+                position: 'relative',
+                width: '100%',
+                height: '100vh',
+                background: 'url(ships.jpg) center center / cover no-repeat',
+                overflowX: 'hidden', // Prevent horizontal scroll
+                padding: '20px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
+        >
+            {/* Panel Container */}
+            <Box
                 sx={{
-                    position: 'absolute',
-                    top: '20px',
-                    right: '20px',
-                    zIndex: 1,
+                    width: '90%',
+                    maxWidth: '1600px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderRadius: '16px',
+                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
+                    padding: '20px',
+                    overflow: 'hidden', // Ensure no internal overflow
+                    margin: '0 auto', // Center the panel
                 }}
             >
-                Register Ship
-            </Button>
-
-            <Box sx={{ height: 400, width: '100%', marginTop: '60px' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    initialState={{
-                        pagination: {
-                            paginationModel: {
-                                pageSize: 5,
-                            },
-                        },
+                {/* Toolbar */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '20px',
                     }}
-                    pageSizeOptions={[5]}
-                    checkboxSelection
-                    disableRowSelectionOnClick
-                />
+                >
+                    <Typography
+                        variant="h5"
+                        sx={{
+                            fontWeight: 'bold',
+                            color: '#333',
+                        }}
+                    >
+                        Zarządzanie statkami
+                    </Typography>
+
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={handleRegisterOpen}
+                        sx={{
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        Dodaj statek
+                    </Button>
+                </Box>
+
+                {/* DataGrid */}
+                <Box
+                    sx={{
+                        height: '400px',
+                        overflow: 'hidden',
+                    }}
+                >
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        initialState={{
+                            pagination: {
+                                paginationModel: {
+                                    pageSize: 5,
+                                },
+                            },
+                        }}
+                        pageSizeOptions={[5]}
+                        checkboxSelection
+                        disableRowSelectionOnClick
+                        sx={{
+                            fontSize: { xs: '0.8rem', sm: '1rem' },
+                        }}
+                    />
+                </Box>
             </Box>
 
-            <Dialog open={editDialogOpen} onClose={handleEditClose}>
+            {/* Edit Ship Dialog */}
+            <Dialog open={editDialogOpen} onClose={handleEditClose} fullWidth maxWidth="sm">
                 <DialogTitle>Edit Ship</DialogTitle>
                 <DialogContent>
                     <TextField
@@ -275,13 +330,13 @@ function Ships() {
                     />
                     <TextField
                         label="Wharf"
-                        value={editShip?.wharf?.id || ''} // Jeśli `wharf` to null, wartość będzie pusta
+                        value={editShip?.wharf?.id || ''}
                         onChange={(e) => handleEditChange('wharf', e.target.value)}
                         margin="normal"
                         fullWidth
                         select
                     >
-                        <MenuItem value="">No Wharf</MenuItem> {/* Dodanie opcji "No Wharf" */}
+                        <MenuItem value="">No Wharf</MenuItem>
                         {wharfs.map((wharf) => (
                             <MenuItem key={wharf.id} value={wharf.id}>
                                 {wharf.name}
@@ -299,7 +354,8 @@ function Ships() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={registerDialogOpen} onClose={handleRegisterClose}>
+            {/* Register Ship Dialog */}
+            <Dialog open={registerDialogOpen} onClose={handleRegisterClose} fullWidth maxWidth="sm">
                 <DialogTitle>Register New Ship</DialogTitle>
                 <DialogContent>
                     <TextField
@@ -343,7 +399,14 @@ function Ships() {
                         onChange={(e) => handleRegisterChange('type', e.target.value)}
                         margin="normal"
                         fullWidth
-                    />
+                        select // Converts TextField into a dropdown
+                    >
+                        <MenuItem value="Kontenerowiec">Kontenerowiec</MenuItem>
+                        <MenuItem value="Masowiec">Masowiec</MenuItem>
+                        <MenuItem value="Tankowiec">Tankowiec</MenuItem>
+                        <MenuItem value="Inny">Inny</MenuItem>
+                    </TextField>
+
                     <TextField
                         label="Wharf"
                         value={newShip.wharf}
@@ -352,7 +415,7 @@ function Ships() {
                         fullWidth
                         select
                     >
-                        <MenuItem value="">No Wharf</MenuItem> {/* Dodanie opcji "No Wharf" */}
+                        <MenuItem value="">No Wharf</MenuItem>
                         {wharfs.map((wharf) => (
                             <MenuItem key={wharf.id} value={wharf.id}>
                                 {wharf.name}
@@ -370,6 +433,7 @@ function Ships() {
                 </DialogActions>
             </Dialog>
         </Box>
+
     );
 }
 

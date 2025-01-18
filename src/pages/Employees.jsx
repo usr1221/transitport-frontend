@@ -7,7 +7,8 @@ import {
     DialogContent,
     DialogTitle,
     TextField,
-    MenuItem,
+    Typography,
+    MenuItem
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from '../axiosInstance';
@@ -191,43 +192,95 @@ function Employees() {
         position: employee.position,
         phoneNumber: employee.phoneNumber,
         pesel: employee.pesel,
-        port: employee.port?.id || 'Brak danych',
+        port: employee.port?.name || 'Brak danych',
     }));
 
     return (
-        <Box sx={{ position: 'relative', height: '100%', width: '100%' }}>
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleRegisterOpen}
+        <Box
+            sx={{
+                position: 'relative',
+                width: '100%',
+                height: '100vh',
+                background: 'url(workers.jpg) center center / cover no-repeat', // Background image for employees
+                overflowX: 'hidden',
+                padding: '20px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
+        >
+            {/* Panel Container */}
+            <Box
                 sx={{
-                    position: 'absolute',
-                    top: '20px',
-                    right: '20px',
-                    zIndex: 1,
+                    width: '90%',
+                    maxWidth: '1600px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderRadius: '16px',
+                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
+                    padding: '20px',
+                    overflow: 'hidden',
                 }}
             >
-                ZAREJESTRUJ
-            </Button>
-
-            <Box sx={{ height: 400, width: '100%', marginTop: '60px' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    initialState={{
-                        pagination: {
-                            paginationModel: {
-                                pageSize: 5,
-                            },
-                        },
+                {/* Toolbar */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '20px',
                     }}
-                    pageSizeOptions={[5]}
-                    checkboxSelection
-                    disableRowSelectionOnClick
-                />
+                >
+                    <Typography
+                        variant="h5"
+                        sx={{
+                            fontWeight: 'bold',
+                            color: '#333',
+                        }}
+                    >
+                        Zarządzanie pracownikami
+                    </Typography>
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleRegisterOpen}
+                        sx={{
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        ZAREJESTRUJ
+                    </Button>
+                </Box>
+
+                {/* DataGrid */}
+                <Box
+                    sx={{
+                        height: '400px',
+                        overflow: 'hidden',
+                    }}
+                >
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        initialState={{
+                            pagination: {
+                                paginationModel: {
+                                    pageSize: 5,
+                                },
+                            },
+                        }}
+                        pageSizeOptions={[5]}
+                        checkboxSelection
+                        disableRowSelectionOnClick
+                        sx={{
+                            fontSize: { xs: '0.8rem', sm: '1rem' },
+                        }}
+                    />
+                </Box>
             </Box>
 
-            <Dialog open={editDialogOpen} onClose={handleEditClose}>
+            {/* Edit Employee Dialog */}
+            <Dialog open={editDialogOpen} onClose={handleEditClose} fullWidth maxWidth="sm">
                 <DialogTitle>Edytuj pracownika</DialogTitle>
                 <DialogContent>
                     <TextField
@@ -257,7 +310,13 @@ function Employees() {
                         onChange={(e) => handleEditChange('position', e.target.value)}
                         margin="normal"
                         fullWidth
-                    />
+                        select
+                    >
+                        <MenuItem value="Administrator">Administrator</MenuItem>
+                        <MenuItem value="Konserwator">Konserwator</MenuItem>
+                        <MenuItem value="Magazynier">Magazynier</MenuItem>
+                        <MenuItem value="Przeładunkowy">Przeładunkowy</MenuItem>
+                    </TextField>
                     <TextField
                         label="PESEL"
                         value={editEmployee?.pesel || ''}
@@ -267,7 +326,7 @@ function Employees() {
                     />
                     <TextField
                         label="Port"
-                        value={editEmployee?.port?.id || ''} // Obsługuje ID portu
+                        value={editEmployee?.port?.id || ''} // Assign the port ID
                         onChange={(e) => handleEditChange('port', e.target.value)}
                         margin="normal"
                         fullWidth
@@ -290,9 +349,8 @@ function Employees() {
                 </DialogActions>
             </Dialog>
 
-
-            {/* Dialog rejestracji */}
-            <Dialog open={registerDialogOpen} onClose={handleRegisterClose}>
+            {/* Register Employee Dialog */}
+            <Dialog open={registerDialogOpen} onClose={handleRegisterClose} fullWidth maxWidth="sm">
                 <DialogTitle>Zarejestruj nowego pracownika</DialogTitle>
                 <DialogContent>
                     <TextField
@@ -359,12 +417,19 @@ function Employees() {
                         <MenuItem value="Przeładunkowy">Przeładunkowy</MenuItem>
                     </TextField>
                     <TextField
-                        label="Port Number"
+                        label="Port"
                         value={newEmployee.port}
                         onChange={(e) => handleRegisterChange('port', e.target.value)}
                         margin="normal"
                         fullWidth
-                    />
+                        select
+                    >
+                        {ports.map((port) => (
+                            <MenuItem key={port.id} value={port.id}>
+                                {port.name}
+                            </MenuItem>
+                        ))}
+                    </TextField>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleRegisterClose} color="secondary">
@@ -376,6 +441,7 @@ function Employees() {
                 </DialogActions>
             </Dialog>
         </Box>
+
     );
 }
 
