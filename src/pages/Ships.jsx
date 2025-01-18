@@ -79,10 +79,7 @@ function Ships() {
     };
 
     const handleRegisterChange = (field, value) => {
-        setNewShip((prev) => ({
-            ...prev,
-            wharf: field === "wharf" && value === "No Wharf" ? null : value,
-        }));
+        setNewShip({ ...newShip, [field]: value });
     };
 
     const handleRegisterSubmit = async () => {
@@ -120,13 +117,18 @@ function Ships() {
     };
 
     const handleEditSave = async () => {
+        const shipToSave = {
+            ...editShip,
+            wharf: editShip.wharf?.id || "", // Jeśli wharf jest null lub pusty, ustaw ""
+        };
+
         try {
-            await axios.put(`/api/ships/${editShip.id}`, editShip, {
+            await axios.put(`/api/ships/${editShip.id}`, shipToSave, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
             });
 
             setShips((prevShips) =>
-                prevShips.map((sh) => (sh.id === editShip.id ? editShip : sh))
+                prevShips.map((sh) => (sh.id === editShip.id ? { ...sh, ...shipToSave } : sh))
             );
             handleEditClose();
         } catch (error) {
@@ -136,15 +138,12 @@ function Ships() {
 
     const handleEditChange = (field, value) => {
         if (field === 'wharf') {
-            setEditShip((prev) => ({
-                ...prev,
-                wharf: value === "No Wharf" ? null : { id: value },
-            }));
+            setEditShip({
+                ...editShip,
+                wharf: value === '' ? null : { ...editShip.wharf, id: value },
+            });
         } else {
-            setEditShip((prev) => ({
-                ...prev,
-                [field]: value,
-            }));
+            setEditShip({ ...editShip, [field]: value });
         }
     };
 
@@ -276,13 +275,13 @@ function Ships() {
                     />
                     <TextField
                         label="Wharf"
-                        value={newShip.wharf || "No Wharf"} // Wyświetl "No Wharf" jako domyślną wartość, jeśli brak nabrzeża
-                        onChange={(e) => handleRegisterChange("wharf", e.target.value)}
+                        value={editShip?.wharf?.id || ''} // Jeśli `wharf` to null, wartość będzie pusta
+                        onChange={(e) => handleEditChange('wharf', e.target.value)}
                         margin="normal"
                         fullWidth
                         select
                     >
-                        <MenuItem value="No Wharf">No Wharf</MenuItem>
+                        <MenuItem value="">No Wharf</MenuItem> {/* Dodanie opcji "No Wharf" */}
                         {wharfs.map((wharf) => (
                             <MenuItem key={wharf.id} value={wharf.id}>
                                 {wharf.name}
@@ -353,6 +352,7 @@ function Ships() {
                         fullWidth
                         select
                     >
+                        <MenuItem value="">No Wharf</MenuItem> {/* Dodanie opcji "No Wharf" */}
                         {wharfs.map((wharf) => (
                             <MenuItem key={wharf.id} value={wharf.id}>
                                 {wharf.name}
