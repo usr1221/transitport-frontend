@@ -109,8 +109,14 @@ function Warehouses() {
     };
 
     const handleEditSave = async () => {
+        const warehouseToSave = {
+            ...editWarehouse,
+            terminalId: editWarehouse.terminal, // Zmieniamy terminal na terminalId
+        };
+        delete warehouseToSave.terminal; // Usuwamy stary klucz terminal (opcjonalnie)
+
         try {
-            await axios.put(`/api/warehouses/${editWarehouse.id}`, editWarehouse, {
+            await axios.put(`/api/warehouses/${editWarehouse.id}`, warehouseToSave, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
             });
 
