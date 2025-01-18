@@ -12,7 +12,7 @@ import {
 import { DataGrid } from '@mui/x-data-grid';
 import axios from '../axiosInstance';
 
-function Warehouse() {
+function Warehouses() {
     const [warehouses, setWarehouses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -79,7 +79,7 @@ function Warehouse() {
             await axios.post('/api/warehouses', newWarehouse, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
             });
-            alert('Warehouse registered successfully!');
+            alert('Warehouses registered successfully!');
             handleRegisterClose();
         } catch (error) {
             console.error('Error registering warehouse:', error.response?.data);
@@ -291,4 +291,4 @@ function Warehouse() {
     );
 }
 
-export default Warehouse;
+export default Warehouses;

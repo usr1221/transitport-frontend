@@ -5,7 +5,7 @@ import Login from './components/LoginForm';
 import Employees from './pages/Employees';
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
-import Warehouse from "./pages/Warehouse";
+import Warehouses from "./pages/Warehouses";
 import Maintainer from "./pages/Maintainer";
 import PrivateRoute from "./components/PrivateRoute";
 import AccessDenied from "./pages/AccessDenied";
@@ -33,7 +33,7 @@ function App() {
           <Route path="/warehouses"
                  element={
                      <PrivateRoute allowedRoles={["ROLE_WAREHOUSE", "ROLE_ADMIN"]}>
-                        <Warehouse />
+                        <Warehouses />
                      </PrivateRoute>} />
           <Route path="/maintainer"
                 element={
