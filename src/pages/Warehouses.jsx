@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from '../axiosInstance';
+import {useNavigate} from "react-router-dom";
 
 function Warehouses() {
     const [warehouses, setWarehouses] = useState([]);
@@ -25,21 +26,20 @@ function Warehouses() {
         occupancy: '',
         terminalId: '',
     });
+    const navigate = useNavigate();
+
+    const fetchWarehouses = async () => {
+        try {
+            const response = await axios.get('/api/warehouses', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+            });
+            setWarehouses(response.data);
+        } catch (error) {
+            console.error('Error fetching warehouses:', error.response?.data);
+        }
+    };
 
     useEffect(() => {
-        const fetchWarehouses = async () => {
-            try {
-                const response = await axios.get('/api/warehouses', {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-                });
-                setWarehouses(response.data);
-            } catch (error) {
-                console.error('Error fetching warehouses:', error.response?.data);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchWarehouses();
     }, []);
 
@@ -80,8 +80,10 @@ function Warehouses() {
             await axios.post('/api/warehouses', newWarehouse, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
             });
-            alert('Warehouses registered successfully!');
-            handleRegisterClose();
+
+            await fetchWarehouses(); // Odśwież dane magazynów
+            alert('Warehouse registered successfully!');
+            handleRegisterClose(); // Zamknij dialog
         } catch (error) {
             console.error('Error registering warehouse:', error.response?.data);
             alert('Failed to register warehouse. Please check the inputs.');
@@ -111,24 +113,21 @@ function Warehouses() {
 
     const handleEditSave = async () => {
         const warehouseToSave = {
-            ...editWarehouse,
-            terminalId: editWarehouse.terminal, // Zmieniamy terminal na terminalId
+            capacity: editWarehouse.capacity, // Pobierz pojemność magazynu
+            occupancy: editWarehouse.occupancy, // Pobierz zajętość magazynu
+            terminalId: editWarehouse.terminalId, // Pobierz poprawne ID terminala
         };
-        delete warehouseToSave.terminal; // Usuwamy stary klucz terminal (opcjonalnie)
 
         try {
             await axios.put(`/api/warehouses/${editWarehouse.id}`, warehouseToSave, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+                headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
             });
 
-            setWarehouses((prevWarehouses) =>
-                prevWarehouses.map((wh) =>
-                    wh.id === editWarehouse.id ? { ...wh, ...editWarehouse } : wh
-                )
-            );
-            handleEditClose();
+            await fetchWarehouses(); // Odśwież dane magazynów
+            handleEditClose(); // Zamknij dialog
         } catch (error) {
-            console.error('Error updating warehouse:', error.response?.data);
+            console.error("Error updating warehouse:", error.response?.data);
+            alert("Failed to update warehouse. Please check the inputs.");
         }
     };
 
@@ -158,7 +157,7 @@ function Warehouses() {
                     </Button>
                     <Button
                         variant="contained"
-                        color="secondary"
+                        color="error"
                         size="small"
                         onClick={() => handleDelete(params.row.id)}
                     >
@@ -190,6 +189,23 @@ function Warehouses() {
                 alignItems: 'center',
             }}
         >
+            <Button
+                variant="contained"
+                onClick={() => navigate(-1)} // Wraca do poprzedniej strony
+                sx={{
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    backgroundColor: 'black',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    '&:hover': {
+                        backgroundColor: '#333',
+                    },
+                }}
+            >
+                Powrót
+            </Button>
             {/* Panel Container */}
             <Box
                 sx={{
@@ -223,13 +239,13 @@ function Warehouses() {
 
                     <Button
                         variant="contained"
-                        color="primary"
+                        color="success"
                         onClick={handleRegisterOpen}
                         sx={{
                             fontWeight: 'bold',
                         }}
                     >
-                        Zarejestruj magazyn
+                        Dodaj magazyn
                     </Button>
                 </Box>
 
@@ -251,7 +267,6 @@ function Warehouses() {
                             },
                         }}
                         pageSizeOptions={[5]}
-                        checkboxSelection
                         disableRowSelectionOnClick
                         sx={{
                             fontSize: { xs: '0.8rem', sm: '1rem' },
@@ -280,14 +295,12 @@ function Warehouses() {
                     />
                     <TextField
                         label="Terminal"
-                        value={newWarehouse.terminalId}
-                        onChange={(e) => handleRegisterChange('terminalId', e.target.value)}
+                        value={editWarehouse?.terminalId || ""} // Aktualny terminal jako wartość domyślna
+                        onChange={(e) => handleEditChange("terminalId", e.target.value)}
                         margin="normal"
                         fullWidth
                         select
                     >
-                        {/* Ensure "No Terminal" sets a null-like value */}
-                        <MenuItem value="">No Terminal</MenuItem>
                         {terminals.map((terminal) => (
                             <MenuItem key={terminal.id} value={terminal.id}>
                                 {terminal.name}
@@ -307,7 +320,7 @@ function Warehouses() {
 
             {/* Register Warehouse Dialog */}
             <Dialog open={registerDialogOpen} onClose={handleRegisterClose} fullWidth maxWidth="sm">
-                <DialogTitle>Zarejestruj nowy magazyn</DialogTitle>
+                <DialogTitle>Dodaj nowy magazyn</DialogTitle>
                 <DialogContent>
                     <TextField
                         label="Capacity"
@@ -340,11 +353,11 @@ function Warehouses() {
                     </TextField>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleRegisterClose} color="secondary">
+                    <Button onClick={handleRegisterClose} color="error">
                         Anuluj
                     </Button>
-                    <Button onClick={handleRegisterSubmit} color="primary">
-                        Zarejestruj
+                    <Button onClick={handleRegisterSubmit} color="success">
+                        Dodaj
                     </Button>
                 </DialogActions>
             </Dialog>

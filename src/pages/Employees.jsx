@@ -12,14 +12,17 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from '../axiosInstance';
+import {useNavigate} from "react-router-dom";
 
 function Employees() {
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
 
+
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editEmployee, setEditEmployee] = useState(null);
     const [ports, setPorts] = useState([]);
+    const navigate = useNavigate();
 
     const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
     const [newEmployee, setNewEmployee] = useState({
@@ -34,20 +37,21 @@ function Employees() {
         port: '',
     });
 
-    useEffect(() => {
-        const fetchEmployees = async () => {
-            try {
-                const response = await axios.get('/api/employees', {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
-                });
-                setEmployees(response.data);
-            } catch (error) {
-                console.error('Error fetching employees:', error.response?.data);
-            } finally {
-                setLoading(false);
-            }
-        };
 
+    const fetchEmployees = async () => {
+        try {
+            const response = await axios.get('/api/employees', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+            });
+            setEmployees(response.data);
+        } catch (error) {
+            console.error('Error fetching employees:', error.response?.data);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchEmployees();
     }, []);
 
@@ -92,8 +96,10 @@ function Employees() {
     const handleRegisterSubmit = async () => {
         try {
             await axios.post('/api/auth/register', newEmployee, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
+                headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
             });
+
+            await fetchEmployees();
             alert('Employee registered successfully!');
             handleRegisterClose();
         } catch (error) {
@@ -126,12 +132,10 @@ function Employees() {
     const handleEditSave = async () => {
         try {
             await axios.put(`/api/employees/${editEmployee.id}`, editEmployee, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
+                headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
             });
 
-            setEmployees((prevEmployees) =>
-                prevEmployees.map((emp) => (emp.id === editEmployee.id ? editEmployee : emp))
-            );
+            await fetchEmployees();
             handleEditClose();
         } catch (error) {
             console.error('Error updating employee:', error.response?.data);
@@ -170,11 +174,11 @@ function Employees() {
                         onClick={() => handleEditOpen(params.row)}
                         sx={{ marginRight: 1 }}
                     >
-                        Modyfikuj
+                        Edytuj
                     </Button>
                     <Button
                         variant="contained"
-                        color="secondary"
+                        color="error"
                         size="small"
                         onClick={() => handleDelete(params.row.id)}
                     >
@@ -209,6 +213,23 @@ function Employees() {
                 alignItems: 'center',
             }}
         >
+            <Button
+                variant="contained"
+                onClick={() => navigate(-1)} // Wraca do poprzedniej strony
+                sx={{
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    backgroundColor: 'black',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    '&:hover': {
+                        backgroundColor: '#333',
+                    },
+                }}
+            >
+                Powrót
+            </Button>
             {/* Panel Container */}
             <Box
                 sx={{
@@ -242,7 +263,7 @@ function Employees() {
 
                     <Button
                         variant="contained"
-                        color="primary"
+                        color="success"
                         onClick={handleRegisterOpen}
                         sx={{
                             fontWeight: 'bold',
@@ -270,7 +291,6 @@ function Employees() {
                             },
                         }}
                         pageSizeOptions={[5]}
-                        checkboxSelection
                         disableRowSelectionOnClick
                         sx={{
                             fontSize: { xs: '0.8rem', sm: '1rem' },

@@ -13,6 +13,9 @@ import {
 import '../global.css';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from '../axiosInstance';
+import { useNavigate } from 'react-router-dom';
+
+
 
 function Ships() {
     const [ships, setShips] = useState([]);
@@ -21,6 +24,7 @@ function Ships() {
     const [editShip, setEditShip] = useState(null);
     const [wharfs, setWharfs] = useState([]);
     const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
+    const navigate = useNavigate();
     const [newShip, setNewShip] = useState({
         name: '',
         homePort: '',
@@ -30,33 +34,30 @@ function Ships() {
         type: '',
         wharf: '',
     });
+    const fetchShips = async () => {
+        try {
+            const response = await axios.get('/api/ships', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+            });
+            setShips(response.data);
+        } catch (error) {
+            console.error('Error fetching ships:', error.response?.data);
+        }
+    };
 
     useEffect(() => {
-        const fetchShips = async () => {
-            try {
-                const response = await axios.get('/api/ships', {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-                });
-                setShips(response.data);
-            } catch (error) {
-                console.error('Error fetching ships:', error.response?.data);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchShips();
     }, []);
 
     useEffect(() => {
         const fetchWharfs = async () => {
             try {
-                const response = await axios.get('/api/wharfs', {
+                const response = await axios.get('/api/wharves', {
                     headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
                 });
                 setWharfs(response.data);
             } catch (error) {
-                console.error('Error fetching wharfs:', error.response?.data);
+                console.error('Error fetching wharves:', error.response?.data);
             }
         };
 
@@ -89,8 +90,11 @@ function Ships() {
             await axios.post('/api/ships', newShip, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
             });
+
+            await fetchShips(); // Pobierz zaktualizowaną listę statków
+
             alert('Ship registered successfully!');
-            handleRegisterClose();
+            handleRegisterClose(); // Zamknij dialog
         } catch (error) {
             console.error('Error registering ship:', error.response?.data);
             alert('Failed to register ship. Please check the inputs.');
@@ -125,14 +129,16 @@ function Ships() {
         };
 
         try {
-            await axios.put(`/api/ships/${editShip.id}`, shipToSave, {
+            const response = await axios.put(`/api/ships/${editShip.id}`, shipToSave, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
             });
 
             setShips((prevShips) =>
-                prevShips.map((sh) => (sh.id === editShip.id ? { ...sh, ...shipToSave } : sh))
+                prevShips.map((sh) =>
+                    sh.id === editShip.id ? { ...response.data } : sh
+                )
             );
-            handleEditClose();
+            handleEditClose(); // Zamknij dialog
         } catch (error) {
             console.error('Error updating ship:', error.response?.data);
         }
@@ -175,7 +181,7 @@ function Ships() {
                     </Button>
                     <Button
                         variant="contained"
-                        color="secondary"
+                        color="error"
                         size="small"
                         onClick={() => handleDelete(params.row.id)}
                     >
@@ -198,6 +204,7 @@ function Ships() {
     }));
 
     return (
+
         <Box
             sx={{
                 position: 'relative',
@@ -211,6 +218,24 @@ function Ships() {
                 alignItems: 'center',
             }}
         >
+            <Button
+                variant="contained"
+                onClick={() => navigate(-1)} // Wraca do poprzedniej strony
+                sx={{
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    backgroundColor: 'black',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    '&:hover': {
+                        backgroundColor: '#333',
+                    },
+                }}
+            >
+                Powrót
+            </Button>
+
             {/* Panel Container */}
             <Box
                 sx={{
@@ -273,7 +298,6 @@ function Ships() {
                             },
                         }}
                         pageSizeOptions={[5]}
-                        checkboxSelection
                         disableRowSelectionOnClick
                         sx={{
                             fontSize: { xs: '0.8rem', sm: '1rem' },
@@ -339,7 +363,7 @@ function Ships() {
                         <MenuItem value="">No Wharf</MenuItem>
                         {wharfs.map((wharf) => (
                             <MenuItem key={wharf.id} value={wharf.id}>
-                                {wharf.name}
+                                {`Wharf ${wharf.id} - Length: ${wharf.length}, Depth: ${wharf.depth}`}
                             </MenuItem>
                         ))}
                     </TextField>
@@ -418,7 +442,7 @@ function Ships() {
                         <MenuItem value="">No Wharf</MenuItem>
                         {wharfs.map((wharf) => (
                             <MenuItem key={wharf.id} value={wharf.id}>
-                                {wharf.name}
+                                {`Wharf ${wharf.id} - Length: ${wharf.length}, Depth: ${wharf.depth}`}
                             </MenuItem>
                         ))}
                     </TextField>

@@ -29,10 +29,13 @@ export default function AccountAppBar() {
                     navigate('/admin');
                     break;
                 case 'ROLE_MAINTAINER':
-                    navigate('/maintainer');
+                    navigate('/ships');
                     break;
                 case 'ROLE_HANDLER':
-                    navigate('/handler');
+                    navigate('/terminals');
+                    break;
+                case 'ROLE_WAREHOUSE':
+                    navigate('/warehouses');
                     break;
                 default:
                     navigate('/'); // Domyślna strona

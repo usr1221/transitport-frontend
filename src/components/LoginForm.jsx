@@ -28,15 +28,15 @@ const LoginForm = () => {
 
             const role = await fetchUserRole(); // Pobierz rolę z backendu
             if (role === 'ROLE_ADMIN') {
-                window.location.href = '/admin';
+                window.location.href = '/';
             } else if (role === 'ROLE_MAINTAINER') {
-                window.location.href = '/maintainer';
+                window.location.href = '/';
             } else if (role === 'ROLE_WAREHOUSE') {
-                window.location.href = '/warehouse';
+                window.location.href = '/';
             } else if (role === 'ROLE_HANDLER') {
-                window.location.href = '/handler';
+                window.location.href = '/';
             } else {
-                window.location.href = '/employees';
+                window.location.href = '/';
             }
         } catch (err) {
             setError('Invalid email or password');

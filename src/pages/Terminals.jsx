@@ -13,6 +13,7 @@ import {
 import "../global.css";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "../axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 function Terminals() {
     const [terminals, setTerminals] = useState([]);
@@ -25,27 +26,27 @@ function Terminals() {
         portId: "",
     });
     const [editTerminal, setEditTerminal] = useState(null);
+    const navigate = useNavigate();
 
-    // Fetch terminals and ports on load
+    const fetchData = async () => {
+        try {
+            const [terminalsResponse, portsResponse] = await Promise.all([
+                axios.get("/api/terminals", {
+                    headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
+                }),
+                axios.get("/api/ports", {
+                    headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
+                }),
+            ]);
+
+            setTerminals(terminalsResponse.data);
+            setPorts(portsResponse.data);
+        } catch (error) {
+            console.error("Error fetching data:", error.response?.data);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [terminalsResponse, portsResponse] = await Promise.all([
-                    axios.get("/api/terminals", {
-                        headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
-                    }),
-                    axios.get("/api/ports", {
-                        headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
-                    }),
-                ]);
-
-                setTerminals(terminalsResponse.data);
-                setPorts(portsResponse.data);
-            } catch (error) {
-                console.error("Error fetching data:", error.response?.data);
-            }
-        };
-
         fetchData();
     }, []);
 
@@ -71,10 +72,13 @@ function Terminals() {
             await axios.post("/api/terminals", newTerminal, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
             });
+
+            await fetchData();
             alert("Terminal registered successfully!");
             handleRegisterClose();
         } catch (error) {
             console.error("Error registering terminal:", error.response?.data);
+            alert("Failed to register terminal. Please try again.");
         }
     };
 
@@ -97,12 +101,9 @@ function Terminals() {
             await axios.put(`/api/terminals/${editTerminal.id}`, editTerminal, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
             });
+
+            await fetchData(); // Pobierz zaktualizowaną listę terminali i portów
             alert("Terminal updated successfully!");
-            setTerminals((prevTerminals) =>
-                prevTerminals.map((terminal) =>
-                    terminal.id === editTerminal.id ? editTerminal : terminal
-                )
-            );
             handleEditClose();
         } catch (error) {
             console.error("Error updating terminal:", error.response?.data);
@@ -143,7 +144,7 @@ function Terminals() {
                     </Button>
                     <Button
                         variant="contained"
-                        color="secondary"
+                        color="error"
                         size="small"
                         onClick={() => handleDelete(params.row.id)}
                     >
@@ -175,6 +176,23 @@ function Terminals() {
                 alignItems: "center",
             }}
         >
+            <Button
+                variant="contained"
+                onClick={() => navigate(-1)} // Wraca do poprzedniej strony
+                sx={{
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    backgroundColor: 'black',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    '&:hover': {
+                        backgroundColor: '#333',
+                    },
+                }}
+            >
+                Powrót
+            </Button>
             <Box
                 sx={{
                     width: "90%",
@@ -206,7 +224,7 @@ function Terminals() {
 
                     <Button
                         variant="contained"
-                        color="primary"
+                        color="success"
                         onClick={handleRegisterOpen}
                         sx={{
                             fontWeight: "bold",
@@ -233,7 +251,6 @@ function Terminals() {
                             },
                         }}
                         pageSizeOptions={[5]}
-                        checkboxSelection
                         disableRowSelectionOnClick
                         sx={{
                             fontSize: { xs: "0.8rem", sm: "1rem" },
@@ -244,7 +261,7 @@ function Terminals() {
 
             {/* Register Terminal Dialog */}
             <Dialog open={registerDialogOpen} onClose={handleRegisterClose} fullWidth maxWidth="sm">
-                <DialogTitle>Zarejestruj nowy terminal</DialogTitle>
+                <DialogTitle>Dodaj nowy terminal</DialogTitle>
                 <DialogContent>
                     <TextField
                         label="Name"

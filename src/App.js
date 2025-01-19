@@ -6,10 +6,8 @@ import Employees from './pages/Employees';
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import Warehouses from "./pages/Warehouses";
-import Maintainer from "./pages/Maintainer";
 import PrivateRoute from "./components/PrivateRoute";
 import AccessDenied from "./pages/AccessDenied";
-import Handler from "./pages/Handler";
 import Ships from "./pages/Ships";
 import Terminals from "./pages/Terminals";
 import NotFound from "./pages/NotFound";
@@ -35,20 +33,7 @@ function App() {
                      <PrivateRoute allowedRoles={["ROLE_WAREHOUSE", "ROLE_ADMIN"]}>
                         <Warehouses />
                      </PrivateRoute>} />
-          <Route path="/maintainer"
-                element={
-                    <PrivateRoute allowedRoles={["ROLE_MAINTAINER", "ROLE_ADMIN"]}>
-                        <Maintainer />
-                    </PrivateRoute>
-                }
-          />
-          <Route path="/handler"
-                 element={
-                     <PrivateRoute allowedRoles={["ROLE_HANDLER", "ROLE_ADMIN"]}>
-                         <Handler />
-                     </PrivateRoute>
-                 }
-          />
+
           <Route path="/access-denied"  element={<AccessDenied />} />
             <Route path="*"  element={<NotFound />} />
         </Routes>
