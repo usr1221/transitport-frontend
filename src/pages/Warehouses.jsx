@@ -82,11 +82,11 @@ function Warehouses() {
             });
 
             await fetchWarehouses(); // Odśwież dane magazynów
-            alert('Warehouse registered successfully!');
+            alert('Magazyn dodany poprawnie!');
             handleRegisterClose(); // Zamknij dialog
         } catch (error) {
-            console.error('Error registering warehouse:', error.response?.data);
-            alert('Failed to register warehouse. Please check the inputs.');
+            console.error('Błąd dodawania magazynu:', error.response?.data);
+            alert('Błąd dodawania magazynu. Sprawdź wprowadzone dane i spróbuj ponownie.');
         }
     };
 
@@ -97,7 +97,7 @@ function Warehouses() {
             });
             setWarehouses(warehouses.filter((warehouse) => warehouse.id !== id));
         } catch (error) {
-            console.error('Error deleting warehouse:', error.response?.data);
+            console.error('Błąd usuwania magazynu:', error.response?.data);
         }
     };
 
@@ -113,9 +113,9 @@ function Warehouses() {
 
     const handleEditSave = async () => {
         const warehouseToSave = {
-            capacity: editWarehouse.capacity, // Pobierz pojemność magazynu
-            occupancy: editWarehouse.occupancy, // Pobierz zajętość magazynu
-            terminalId: editWarehouse.terminalId, // Pobierz poprawne ID terminala
+            capacity: editWarehouse.capacity,
+            occupancy: editWarehouse.occupancy,
+            terminalId: editWarehouse.terminalId,
         };
 
         try {
@@ -123,11 +123,17 @@ function Warehouses() {
                 headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
             });
 
-            await fetchWarehouses(); // Odśwież dane magazynów
-            handleEditClose(); // Zamknij dialog
+            await fetchWarehouses();
+            alert("Edycja magazynu poprawna");
+            handleEditClose();
         } catch (error) {
-            console.error("Error updating warehouse:", error.response?.data);
-            alert("Failed to update warehouse. Please check the inputs.");
+            console.error("Błąd edycji magazynu:", error.response?.data);
+
+            alert(
+                `Błąd edycji magazynu. ${
+                    error.response?.data?.message || "Sprawdź wprowadzone dane i spróbuj ponownie."
+                }`
+            );
         }
     };
 
@@ -137,8 +143,8 @@ function Warehouses() {
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 90 },
-        { field: 'capacity', headerName: 'Capacity', width: 200 },
-        { field: 'occupancy', headerName: 'Occupancy', width: 200 },
+        { field: 'capacity', headerName: 'Pojemność', width: 200 },
+        { field: 'occupancy', headerName: 'Zapełnienie', width: 200 },
         { field: 'terminal', headerName: 'Terminal', width: 200 },
         {
             field: 'actions',
@@ -280,14 +286,14 @@ function Warehouses() {
                 <DialogTitle>Edytuj magazyn</DialogTitle>
                 <DialogContent>
                     <TextField
-                        label="Capacity"
+                        label="Pojemność"
                         value={editWarehouse?.capacity || ''}
                         onChange={(e) => handleEditChange('capacity', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Occupancy"
+                        label="Zapełnienie"
                         value={editWarehouse?.occupancy || ''}
                         onChange={(e) => handleEditChange('occupancy', e.target.value)}
                         margin="normal"
@@ -323,14 +329,14 @@ function Warehouses() {
                 <DialogTitle>Dodaj nowy magazyn</DialogTitle>
                 <DialogContent>
                     <TextField
-                        label="Capacity"
+                        label="Pojemność"
                         value={newWarehouse.capacity}
                         onChange={(e) => handleRegisterChange('capacity', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Occupancy"
+                        label="Zapełnienie"
                         value={newWarehouse.occupancy}
                         onChange={(e) => handleRegisterChange('occupancy', e.target.value)}
                         margin="normal"
@@ -356,7 +362,7 @@ function Warehouses() {
                     <Button onClick={handleRegisterClose} color="error">
                         Anuluj
                     </Button>
-                    <Button onClick={handleRegisterSubmit} color="success">
+                    <Button onClick={handleRegisterSubmit} color="primary">
                         Dodaj
                     </Button>
                 </DialogActions>

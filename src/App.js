@@ -18,9 +18,24 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/employees" element={<Employees />} />
-          <Route path="/ships" element={<Ships />} />
-          <Route path="/terminals" element={<Terminals />} />
+          <Route path="/employees" element={
+              <PrivateRoute allowedRoles={["ROLE_ADMIN"]}>
+                  <Employees />
+              </PrivateRoute>
+          }
+          />
+          <Route path="/ships" element={
+              <PrivateRoute allowedRoles={["ROLE_ADMIN","ROLE_MAINTAINER"]}>
+                  <Ships />
+              </PrivateRoute>
+          }
+          />
+          <Route path="/terminals" element={
+              <PrivateRoute allowedRoles={["ROLE_ADMIN", "ROLE_HANDLER"]}>
+                  <Terminals />
+              </PrivateRoute>
+          }
+          />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={
                    <PrivateRoute allowedRoles={["ROLE_ADMIN"]}>

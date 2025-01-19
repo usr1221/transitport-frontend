@@ -93,11 +93,11 @@ function Ships() {
 
             await fetchShips(); // Pobierz zaktualizowaną listę statków
 
-            alert('Ship registered successfully!');
+            alert('Statek dodany poprawnie!');
             handleRegisterClose(); // Zamknij dialog
         } catch (error) {
-            console.error('Error registering ship:', error.response?.data);
-            alert('Failed to register ship. Please check the inputs.');
+            console.error('Błąd rejestracji statku', error.response?.data);
+            alert('Błąd rejestracji statku. Sprawdź wprowadzone wartości i spróbuj ponownie');
         }
     };
 
@@ -108,7 +108,7 @@ function Ships() {
             });
             setShips(ships.filter((ship) => ship.id !== id));
         } catch (error) {
-            console.error('Error deleting ship:', error.response?.data);
+            console.error('Błąd usuwania statku:', error.response?.data);
         }
     };
 
@@ -133,14 +133,21 @@ function Ships() {
                 headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
             });
 
+            // Aktualizuj listę statków
             setShips((prevShips) =>
-                prevShips.map((sh) =>
-                    sh.id === editShip.id ? { ...response.data } : sh
-                )
+                prevShips.map((sh) => (sh.id === editShip.id ? { ...response.data } : sh))
             );
-            handleEditClose(); // Zamknij dialog
+
+            handleEditClose();
+            alert('Edycja statku poprawna');
         } catch (error) {
-            console.error('Error updating ship:', error.response?.data);
+            console.error('Błąd edycji statku:', error.response?.data);
+
+            alert(
+                `Błąd edycji statku. ${
+                    error.response?.data?.message || 'Sprawdź wprowadzone wartości i spróbuj ponownie'
+                }`
+            );
         }
     };
 
@@ -157,13 +164,13 @@ function Ships() {
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 90 },
-        { field: 'name', headerName: 'Name', width: 200 },
-        { field: 'homePort', headerName: 'Home Port', width: 200 },
-        { field: 'draft', headerName: 'Draft', width: 150 },
-        { field: 'length', headerName: 'Length', width: 150 },
-        { field: 'callSign', headerName: 'Call Sign', width: 200 },
-        { field: 'type', headerName: 'Type', width: 150 },
-        { field: 'wharf', headerName: 'Wharf', width: 150 },
+        { field: 'name', headerName: 'Nazwa', width: 200 },
+        { field: 'homePort', headerName: 'Port macierzysty', width: 200 },
+        { field: 'draft', headerName: 'Zanurzenie', width: 150 },
+        { field: 'length', headerName: 'Długość', width: 150 },
+        { field: 'callSign', headerName: 'Sygnał wywoławczy', width: 200 },
+        { field: 'type', headerName: 'Typ', width: 150 },
+        { field: 'wharf', headerName: 'Nabrzeże', width: 150 },
         {
             field: 'actions',
             headerName: 'Actions',
@@ -200,7 +207,7 @@ function Ships() {
         length: ship.length,
         callSign: ship.callSign,
         type: ship.type,
-        wharf: ship.wharf?.id || 'No Wharf',
+        wharf: ship.wharf?.id || 'Brak nabrzeża',
     }));
 
     return (
@@ -211,7 +218,7 @@ function Ships() {
                 width: '100%',
                 height: '100vh',
                 background: 'url(ships.jpg) center center / cover no-repeat',
-                overflowX: 'hidden', // Prevent horizontal scroll
+                overflowX: 'hidden',
                 padding: '20px',
                 display: 'flex',
                 justifyContent: 'center',
@@ -311,49 +318,49 @@ function Ships() {
                 <DialogTitle>Edit Ship</DialogTitle>
                 <DialogContent>
                     <TextField
-                        label="Name"
+                        label="Nazwa"
                         value={editShip?.name || ''}
                         onChange={(e) => handleEditChange('name', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Home Port"
+                        label="Port macierzysty"
                         value={editShip?.homePort || ''}
                         onChange={(e) => handleEditChange('homePort', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Draft"
+                        label="Zanurzenie"
                         value={editShip?.draft || ''}
                         onChange={(e) => handleEditChange('draft', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Length"
+                        label="Długość"
                         value={editShip?.length || ''}
                         onChange={(e) => handleEditChange('length', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Call Sign"
+                        label="Sygnał wywoławczy"
                         value={editShip?.callSign || ''}
                         onChange={(e) => handleEditChange('callSign', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Type"
+                        label="Typ"
                         value={editShip?.type || ''}
                         onChange={(e) => handleEditChange('type', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Wharf"
+                        label="Nabrzeże"
                         value={editShip?.wharf?.id || ''}
                         onChange={(e) => handleEditChange('wharf', e.target.value)}
                         margin="normal"
@@ -363,17 +370,17 @@ function Ships() {
                         <MenuItem value="">No Wharf</MenuItem>
                         {wharfs.map((wharf) => (
                             <MenuItem key={wharf.id} value={wharf.id}>
-                                {`Wharf ${wharf.id} - Length: ${wharf.length}, Depth: ${wharf.depth}`}
+                                {`Nabrzeże ${wharf.id} - Długość: ${wharf.length}, Głębokość: ${wharf.depth}`}
                             </MenuItem>
                         ))}
                     </TextField>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleEditClose} color="secondary">
-                        Cancel
+                        Anuluj
                     </Button>
                     <Button onClick={handleEditSave} color="primary">
-                        Save
+                        Zapisz
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -383,47 +390,47 @@ function Ships() {
                 <DialogTitle>Register New Ship</DialogTitle>
                 <DialogContent>
                     <TextField
-                        label="Name"
+                        label="Nazwa"
                         value={newShip.name}
                         onChange={(e) => handleRegisterChange('name', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Home Port"
+                        label="Port macierzysty"
                         value={newShip.homePort}
                         onChange={(e) => handleRegisterChange('homePort', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Draft"
+                        label="Zanurzenie"
                         value={newShip.draft}
                         onChange={(e) => handleRegisterChange('draft', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Length"
+                        label="Długość"
                         value={newShip.length}
                         onChange={(e) => handleRegisterChange('length', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Call Sign"
+                        label="Sygnał wywoławczy"
                         value={newShip.callSign}
                         onChange={(e) => handleRegisterChange('callSign', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Type"
+                        label="Typ"
                         value={newShip.type}
                         onChange={(e) => handleRegisterChange('type', e.target.value)}
                         margin="normal"
                         fullWidth
-                        select // Converts TextField into a dropdown
+                        select
                     >
                         <MenuItem value="Kontenerowiec">Kontenerowiec</MenuItem>
                         <MenuItem value="Masowiec">Masowiec</MenuItem>
@@ -432,7 +439,7 @@ function Ships() {
                     </TextField>
 
                     <TextField
-                        label="Wharf"
+                        label="Nabrzeże"
                         value={newShip.wharf}
                         onChange={(e) => handleRegisterChange('wharf', e.target.value)}
                         margin="normal"
@@ -442,17 +449,17 @@ function Ships() {
                         <MenuItem value="">No Wharf</MenuItem>
                         {wharfs.map((wharf) => (
                             <MenuItem key={wharf.id} value={wharf.id}>
-                                {`Wharf ${wharf.id} - Length: ${wharf.length}, Depth: ${wharf.depth}`}
+                                {`Nabrzeże ${wharf.id} - Długość: ${wharf.length}, Głębokość: ${wharf.depth}`}
                             </MenuItem>
                         ))}
                     </TextField>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleRegisterClose} color="secondary">
-                        Cancel
+                        Anuluj
                     </Button>
                     <Button onClick={handleRegisterSubmit} color="primary">
-                        Register
+                        Dodaj
                     </Button>
                 </DialogActions>
             </Dialog>

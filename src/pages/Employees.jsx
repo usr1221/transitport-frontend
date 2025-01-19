@@ -100,11 +100,11 @@ function Employees() {
             });
 
             await fetchEmployees();
-            alert('Employee registered successfully!');
+            alert('Pracownik zarejestrowany poprawnie');
             handleRegisterClose();
         } catch (error) {
-            console.error('Error registering employee:', error.response?.data);
-            alert('Failed to register employee. Please check the inputs.');
+            console.error('Błąd rejestracji pracownika:', error.response?.data);
+            alert('Rejestracja pracownika nieudana. Sprawdź wprowadzone wartości i spróbuj ponownie.');
         }
     };
 
@@ -115,12 +115,15 @@ function Employees() {
             });
             setEmployees(employees.filter((employee) => employee.id !== id));
         } catch (error) {
-            console.error('Error deleting employee:', error.response?.data);
+            console.error('Błąd usuwania pracownika:', error.response?.data);
         }
     };
 
     const handleEditOpen = (employee) => {
-        setEditEmployee(employee);
+        setEditEmployee({
+            ...employee, // Przekazanie wszystkich pól pracownika
+            portId: employee.port?.id || "", // Pobierz ID portu lub ustaw pustą wartość
+        });
         setEditDialogOpen(true);
     };
 
@@ -137,16 +140,23 @@ function Employees() {
 
             await fetchEmployees();
             handleEditClose();
+            alert('Edycja pracownika poprawna');
         } catch (error) {
-            console.error('Error updating employee:', error.response?.data);
+            console.error('Błąd edycji pracownika:', error.response?.data);
+            alert(
+                `Edycja nieudana. ${
+                    error.response?.data?.message || 'Sprawdź wprowadzone wartości i spróbuj ponownie.'
+                }`
+            );
         }
     };
+
 
     const handleEditChange = (field, value) => {
         if (field === 'port') {
             setEditEmployee({
                 ...editEmployee,
-                port: { ...editEmployee.port, id: value }, // Aktualizacja id portu
+                port: { ...editEmployee.port, id: value },
             });
         } else {
             setEditEmployee({ ...editEmployee, [field]: value });
@@ -155,10 +165,11 @@ function Employees() {
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 90 },
-        { field: 'name', headerName: 'Name', width: 200 },
+        { field: 'firstName', headerName: 'Imię', width: 200 },
+        { field: 'lastName', headerName: 'Nazwisko', width: 200 },
         { field: 'email', headerName: 'Email', width: 250 },
-        { field: 'position', headerName: 'Position', width: 150 },
-        { field: 'phoneNumber', headerName: 'Phone', width: 150 },
+        { field: 'position', headerName: 'Rola', width: 150 },
+        { field: 'phoneNumber', headerName: 'Telefon', width: 150 },
         { field: 'pesel', headerName: 'PESEL', width: 150 },
         { field: 'port', headerName: 'Port', width: 150 },
         {
@@ -191,7 +202,8 @@ function Employees() {
 
     const rows = employees.map((employee) => ({
         id: employee.id,
-        name: `${employee.firstName} ${employee.lastName}`,
+        firstName: employee.firstName,
+        lastName:employee.lastName,
         email: employee.email,
         position: employee.position,
         phoneNumber: employee.phoneNumber,
@@ -304,14 +316,13 @@ function Employees() {
                 <DialogTitle>Edytuj pracownika</DialogTitle>
                 <DialogContent>
                     <TextField
-                        label="First Name"
-                        value={editEmployee?.firstName || ''}
-                        onChange={(e) => handleEditChange('firstName', e.target.value)}
-                        margin="normal"
+                        label="Imię"
+                        value={editEmployee?.firstName || ""}
+                        onChange={(e) => handleEditChange("firstName", e.target.value)}
                         fullWidth
                     />
                     <TextField
-                        label="Last Name"
+                        label="Nazwisko"
                         value={editEmployee?.lastName || ''}
                         onChange={(e) => handleEditChange('lastName', e.target.value)}
                         margin="normal"
@@ -325,7 +336,7 @@ function Employees() {
                         fullWidth
                     />
                     <TextField
-                        label="Position"
+                        label="Rola"
                         value={editEmployee?.position || ''}
                         onChange={(e) => handleEditChange('position', e.target.value)}
                         margin="normal"
@@ -381,7 +392,7 @@ function Employees() {
                         fullWidth
                     />
                     <TextField
-                        label="Password"
+                        label="Hasło"
                         type="password"
                         value={newEmployee.password}
                         onChange={(e) => handleRegisterChange('password', e.target.value)}
@@ -389,14 +400,14 @@ function Employees() {
                         fullWidth
                     />
                     <TextField
-                        label="First Name"
+                        label="Imię"
                         value={newEmployee.firstName}
                         onChange={(e) => handleRegisterChange('firstName', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Last Name"
+                        label="Nazwisko"
                         value={newEmployee.lastName}
                         onChange={(e) => handleRegisterChange('lastName', e.target.value)}
                         margin="normal"
@@ -410,21 +421,21 @@ function Employees() {
                         fullWidth
                     />
                     <TextField
-                        label="Nationality"
+                        label="Narodowość"
                         value={newEmployee.nationality}
                         onChange={(e) => handleRegisterChange('nationality', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Phone Number"
+                        label="Telefon"
                         value={newEmployee.phoneNumber}
                         onChange={(e) => handleRegisterChange('phoneNumber', e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Position"
+                        label="Rola"
                         value={newEmployee.position}
                         onChange={(e) => handleRegisterChange('position', e.target.value)}
                         margin="normal"

@@ -74,11 +74,11 @@ function Terminals() {
             });
 
             await fetchData();
-            alert("Terminal registered successfully!");
+            alert("Terminal dodany poprawnie!");
             handleRegisterClose();
         } catch (error) {
-            console.error("Error registering terminal:", error.response?.data);
-            alert("Failed to register terminal. Please try again.");
+            console.error("Błąd dowania terminala:", error.response?.data);
+            alert("Błąd dodwania terminala. Sprawdź wprowadzone dane i spróbuj ponownie.");
         }
     };
 
@@ -102,12 +102,17 @@ function Terminals() {
                 headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken")}` },
             });
 
-            await fetchData(); // Pobierz zaktualizowaną listę terminali i portów
-            alert("Terminal updated successfully!");
+            await fetchData();
+            alert("Edycja terminala poprawna");
             handleEditClose();
         } catch (error) {
-            console.error("Error updating terminal:", error.response?.data);
-            alert("Failed to update terminal. Please try again.");
+            console.error("Błąd edycji terminala:", error.response?.data);
+
+            alert(
+                `Błąd edycji terminala. ${
+                    error.response?.data?.message || "Sprawdź wprowadzone dane i spróbuj ponownie."
+                }`
+            );
         }
     };
 
@@ -118,18 +123,18 @@ function Terminals() {
             });
             setTerminals(terminals.filter((terminal) => terminal.id !== id));
         } catch (error) {
-            console.error("Error deleting terminal:", error.response?.data);
+            console.error("Błąd usuwania terminala:", error.response?.data);
         }
     };
 
     const columns = [
         { field: "id", headerName: "ID", width: 90 },
-        { field: "name", headerName: "Name", width: 200 },
-        { field: "wharvesCount", headerName: "Wharves Count", width: 150 },
-        { field: "portName", headerName: "Port", width: 200 }, // Display port name
+        { field: "name", headerName: "Nazwa", width: 200 },
+        { field: "wharvesCount", headerName: "Liczba nabrzeży", width: 150 },
+        { field: "portName", headerName: "Port", width: 200 },
         {
             field: "actions",
-            headerName: "Actions",
+            headerName: "Akcje",
             width: 200,
             renderCell: (params) => (
                 <Box>
@@ -264,14 +269,14 @@ function Terminals() {
                 <DialogTitle>Dodaj nowy terminal</DialogTitle>
                 <DialogContent>
                     <TextField
-                        label="Name"
+                        label="Nazwa"
                         value={newTerminal.name}
                         onChange={(e) => handleRegisterChange("name", e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Wharves Count"
+                        label="Liczba nabrzeży"
                         value={newTerminal.wharvesCount}
                         onChange={(e) => handleRegisterChange("wharvesCount", e.target.value)}
                         margin="normal"
@@ -307,14 +312,14 @@ function Terminals() {
                 <DialogTitle>Edytuj terminal</DialogTitle>
                 <DialogContent>
                     <TextField
-                        label="Name"
+                        label="Nazwa"
                         value={editTerminal?.name || ""}
                         onChange={(e) => handleEditChange("name", e.target.value)}
                         margin="normal"
                         fullWidth
                     />
                     <TextField
-                        label="Wharves Count"
+                        label="Liczba nabrzeży"
                         value={editTerminal?.wharvesCount || ""}
                         onChange={(e) => handleEditChange("wharvesCount", e.target.value)}
                         margin="normal"
