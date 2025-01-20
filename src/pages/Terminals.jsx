@@ -77,8 +77,8 @@ function Terminals() {
             alert("Terminal dodany poprawnie!");
             handleRegisterClose();
         } catch (error) {
-            console.error("Błąd dowania terminala:", error.response?.data);
-            alert("Błąd dodwania terminala. Sprawdź wprowadzone dane i spróbuj ponownie.");
+            console.error("Błąd dodawania terminala:", error.response?.data);
+            alert("Błąd dodawania terminala. Sprawdź wprowadzone dane i spróbuj ponownie.");
         }
     };
 
